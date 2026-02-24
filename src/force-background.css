@@ -1,0 +1,30 @@
+/* THIS WILL FORCE THE BACKGROUND */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: linear-gradient(145deg, #097c7f 0%, #326784 50%, #6bb0d6 100%) !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 30%),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.1) 0%, transparent 40%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
