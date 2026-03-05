@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useJobs } from '../context/JobContext';
 import AnimatedCard from '../components/AnimatedCard';
 import StatsCard from '../components/StatsCard';
-import ImportExport from '../components/ImportExport';
 import EmptyState from '../components/EmptyState';
 import { 
   FaSearch, FaFilter, FaBriefcase, FaClock, 
   FaCheckCircle, FaTimesCircle, FaLink, FaCalendarCheck,
-  FaChartLine, FaDownload, FaUpload, FaBell
+  FaChartLine, FaDownload, FaUpload, FaBell, FaCheck,
+  FaTimes
 } from 'react-icons/fa';
 
 function Dashboard() {
-  const { jobs, deleteJob, getStats, loading } = useJobs();
+  const { jobs, deleteJob, getStats, loading, exportJobs, importJobs } = useJobs();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const [importError, setImportError] = useState('');
+  const fileInputRef = useRef();
 
   const statuses = ['All', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
   const stats = getStats();
@@ -27,6 +30,25 @@ function Dashboard() {
     const matchesStatus = filterStatus === 'All' || job.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        await importJobs(file);
+        setImportSuccess(true);
+        setTimeout(() => setImportSuccess(false), 3000);
+      } catch (error) {
+        setImportError(error.message);
+        setTimeout(() => setImportError(''), 3000);
+      }
+    }
+    e.target.value = null;
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current.click();
+  };
 
   // Different colors for each stat card
   const statCards = [
@@ -81,6 +103,33 @@ function Dashboard() {
           )}
         </AnimatePresence>
 
+        {/* Success/Error Messages */}
+        <AnimatePresence>
+          {importSuccess && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg flex items-center gap-2"
+            >
+              <FaCheck />
+              <span>Jobs imported successfully!</span>
+            </motion.div>
+          )}
+          
+          {importError && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg flex items-center gap-2"
+            >
+              <FaTimes />
+              <span>Error: {importError}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header with Animated Teal Gradient */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
@@ -97,29 +146,43 @@ function Dashboard() {
           </p>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Import/Export Actions */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
           className="mb-8 flex justify-end gap-4"
         >
+          {/* Export Button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={exportJobs}
             className="px-6 py-3 bg-gradient-to-r from-[#097c7f] to-[#326784] text-white rounded-xl shadow-lg hover:shadow-xl transition flex items-center gap-2"
           >
             <FaDownload />
-            Export Report
+            Export JSON
           </motion.button>
+          
+          {/* Import Button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleImportClick}
             className="px-6 py-3 bg-white text-[#097c7f] border-2 border-[#097c7f] rounded-xl hover:bg-[#e0f7f5] transition flex items-center gap-2"
           >
             <FaUpload />
-            Import Data
+            Import JSON
           </motion.button>
+          
+          {/* Hidden file input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json"
+            className="hidden"
+          />
         </motion.div>
 
         {/* Stats Grid - With Different Colors */}
@@ -314,7 +377,7 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Add animation keyframes if not already in index.css */}
+      {/* Animation keyframes */}
       <style jsx>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }

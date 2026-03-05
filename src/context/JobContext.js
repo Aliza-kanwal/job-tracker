@@ -61,38 +61,50 @@ export function JobProvider({ children }) {
     };
   };
 
-  // Export jobs as JSON
-  const exportJobs = () => {
-    const dataStr = JSON.stringify(jobs, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = `job-applications-${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  };
+ // Export jobs as JSON
+const exportJobs = () => {
+  const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+  const dataStr = JSON.stringify(jobs, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  const exportFileDefaultName = `job-applications-${new Date().toISOString().split('T')[0]}.json`;
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+};
 
-  // Import jobs from JSON
-  const importJobs = (jsonFile) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const importedJobs = JSON.parse(e.target.result);
-          if (Array.isArray(importedJobs)) {
+// Import jobs from JSON
+const importJobs = (jsonFile) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedJobs = JSON.parse(e.target.result);
+        if (Array.isArray(importedJobs)) {
+          // Validate each job has required fields
+          const validJobs = importedJobs.every(job => 
+            job.id && job.company && job.position && job.status && job.date
+          );
+          
+          if (validJobs) {
+            localStorage.setItem('jobs', JSON.stringify(importedJobs));
+            // Update state
             setJobs(importedJobs);
             resolve(importedJobs);
           } else {
-            reject(new Error('Invalid JSON format'));
+            reject(new Error('Invalid job data format'));
           }
-        } catch (error) {
-          reject(error);
+        } else {
+          reject(new Error('Invalid JSON format - expected an array'));
         }
-      };
-      reader.readAsText(jsonFile);
-    });
-  };
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.readAsText(jsonFile);
+  });
+};
 
   return (
     <JobContext.Provider value={{
