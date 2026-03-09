@@ -20,10 +20,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "build": "npx react-scripts build",
-    "start": "npx react-scripts start"
-  }
-,
+    "build": "react-scripts build",
+    "start": "react-scripts start"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
