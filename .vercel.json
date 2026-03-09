@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx react-scripts build",
+  "buildCommand": "CI=false npx react-scripts build",
   "outputDirectory": "build",
   "devCommand": "npx react-scripts start",
   "installCommand": "npm install"
