@@ -18,11 +18,12 @@
     "uuid": "^13.0.0",
     "web-vitals": "^2.1.4"
   },
-  "scripts": { 
-    "build": "npx react-scripts build",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+  "scripts": {
+    "preinstall": "npx npm-force-resolutions || true",
+    "install": "npm install --ignore-scripts",
+    "postinstall": "chmod -R +x node_modules/.bin || true",
+    "build": "node node_modules/react-scripts/bin/react-scripts.js build",
+    "start": "node node_modules/react-scripts/bin/react-scripts.js start"
   },
   "eslintConfig": {
     "extends": [
