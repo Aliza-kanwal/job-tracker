@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npx react-scripts build",
+  "installCommand": "yarn install",
+  "buildCommand": "yarn build",
   "outputDirectory": "build",
-  "devCommand": "npx react-scripts start",
-  "installCommand": "npm install"
+  "devCommand": "yarn start"
 }
