@@ -1,11 +1,6 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "buildCommand": "npx --yes react-scripts build"
-      }
-    }
-  ]
+  "buildCommand": "npx react-scripts build",
+  "outputDirectory": "build",
+  "devCommand": "npx react-scripts start",
+  "installCommand": "npm install"
 }
